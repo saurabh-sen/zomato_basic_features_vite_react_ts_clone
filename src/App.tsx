@@ -33,8 +33,8 @@ function App() {
   const handleComponentRender = () => {
     if(showFavoriteRestaurant){
 
-      return favoriteRestaurant.map((restaurant:object, index:number) => {
-        if(restaurant.fav){
+      return favoriteRestaurant.map((restaurant:any, index:number) => {
+        if(restaurant.fav == true){
         return (
           <Cards key={index} favoriteRestaurant={favoriteRestaurant} restaurant={restaurant} />
         )
