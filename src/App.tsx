@@ -1,12 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Cards from "./Cards";
 import { data, uniqueDropDown, handleSort } from "./data"
 
 function App() {
   const [restaurants, setRestaurants] = useState<any>([]);
-  const [searchData, setSearchData] = useState<any>();
+
+  const [searchValue, setSearchValue] = useState<String>('');
+  
   const [dropDownItem, setDropDownItem] = useState<any>();
+  
   const [favoriteRestaurant, setFavoriteRestaurant] = useState<any>();
+
   const [showFavoriteRestaurant, setShowFavoriteRestaurant] = useState<Boolean>(false);
 
   useEffect(() => {
@@ -17,49 +21,11 @@ function App() {
     
   }, []);
 
-  const handleSearch = (value : any) => {
-
-    const searchResult = restaurants.filter((item : any, index:number) => {
-      return item.name.toLowerCase().includes(value.toLowerCase());
+  const filteredData = useMemo(() => {
+    return restaurants.filter((item : any) => {
+      return item.name.toLowerCase().includes(searchValue.toLowerCase());
     });
-    setSearchData(searchResult)
-
-  };
-
-  const handleFavorite = () => {
-    setShowFavoriteRestaurant(!showFavoriteRestaurant);
-  };
-  
-  const handleComponentRender = () => {
-    if(showFavoriteRestaurant){
-
-      return favoriteRestaurant.map((restaurant:any, index:number) => {
-        if(restaurant.fav == true){
-        return (
-          <Cards key={index} favoriteRestaurant={favoriteRestaurant} restaurant={restaurant} />
-        )
-        }
-      })
-
-    }else if(searchData){
-
-      return searchData.map((restaurant:object, index:number) => {
-          return (
-            <Cards key={index} favoriteRestaurant={favoriteRestaurant} restaurant={restaurant} />
-          )
-        })
-
-    }
-    else{
-
-      return restaurants.map((restaurant: object, index: number) => {
-        return (
-          <Cards key={index} favoriteRestaurant={favoriteRestaurant} restaurant={restaurant} />
-        )
-      })
-
-    }
-  }
+  }, [restaurants, searchValue])
 
   return (
     <div className="App">
@@ -76,7 +42,7 @@ function App() {
               placeholder="Search"
               aria-label="Search"
               aria-describedby="button-addon2"
-              onChange={(e) => handleSearch(e.target.value)}
+              onChange={(e) => setSearchValue(e.target.value)}
             />
 
           </div>
@@ -96,13 +62,13 @@ function App() {
 
           <div className="input-group relative flex flex-row flex-wrap items-stretch w-full mb-4">
             <label htmlFor="sort" className="text-center m-4">
-              Sort
+              Show favorite restaurants
             </label>
             <button
               className="btn my-4 py-4 px-8 rounded-xl bg-blue-400"
               type="button"
               id="button-addon2"
-              onClick={handleFavorite}
+              onClick={() => setShowFavoriteRestaurant(!showFavoriteRestaurant)}
             >show favorite restaurants
             </button>
           </div>
@@ -112,7 +78,19 @@ function App() {
 
       <div className="flex flex-wrap justify-between items-center w-4/5 m-auto">
       {
-        handleComponentRender()
+
+        showFavoriteRestaurant ? favoriteRestaurant.map((restaurant:any, index:number) => {
+          if(restaurant.fav == true){
+          return (
+            <Cards key={index} favoriteRestaurant={favoriteRestaurant} restaurant={restaurant} />
+          )
+          }
+        }) : filteredData.map((restaurant:object, index:number) => {
+                  return (
+                    <Cards key={index} favoriteRestaurant={favoriteRestaurant} restaurant={restaurant} />
+                  )
+                })
+
       }
       </div>
     </div>
